@@ -1,0 +1,37 @@
+import requests
+import csv
+from bs4 import BeautifulSoup
+
+def scrape_product(url):
+	response = requests.get(url)
+	soup = BeautifulSoup(response.text, 'html.parser')
+
+
+    	description = soup.find('div', class_='description').text.strip()
+    	asin = soup.find('span', class_='asin').text.strip()
+    	product_description = soup.find('p', class_='product-description').text.strip()
+    	manufacturer = soup.find('span', class_='manufacturer').text.strip()
+
+   return {
+        'URL': url,
+        'Description': description,
+        'ASIN': asin,
+        'Product Description': product_description,
+        'Manufacturer': manufacturer
+    }
+
+product_urls = [
+    'https://www.amazon.in/American-Tourister-AMT-SCH-02/dp/B07CJCGM1M/ref=sr_1_3?crid=2M096C61O4MLT&keywords=bags&qid=1685544768&sprefix=ba%2Caps%2C283&sr=8-3',
+    'https://www.amazon.in/Wesley-Milestone-Waterproof-Backpack-Business/dp/B084JGJ8PF/ref=sr_1_4?crid=2M096C61O4MLT&keywords=bags&qid=1685544768&sprefix=ba%2Caps%2C283&sr=8-4',
+    'https://www.amazon.in/American-Tourister-BACKPACK-COMPARTMENT-ORGANIZER/dp/B0BTD4S4XF/ref=sr_1_5?crid=2M096C61O4MLT&keywords=bags&qid=1685544768&sprefix=ba%2Caps%2C283&sr=8-5',
+   ]
+
+csv_file = open('scraped_data.csv', 'w', newline='')
+csv_writer = csv.DictWriter(csv_file, fieldnames=['URL', 'Description', 'ASIN', 'Product Description', 'Manufacturer'])
+csv_writer.writeheader()
+
+for url in product_urls:
+    data = scrape_product(url)
+    csv_writer.writerow(data)
+
+csv_file.close()
